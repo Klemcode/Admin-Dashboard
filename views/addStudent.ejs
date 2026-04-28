@@ -52,12 +52,20 @@
     <div class="card shadow-lg">
 
         <div class="card-header">
-            🎓 Create Student Profile
+            Create Student Profile
         </div>
+        
+       <% if (message) { %>
+  <div class="alert alert-success text-center">
+    <%= message %>
+  </div>
+<% } %>
+        
 
         <div class="card-body p-4">
 
-            <form action="/addUser" method="post">
+            <form action="/addStudent" method="POST" enctype="multipart/form-data">
+                
 
                 <div class="mb-3">
                     <input type="text" class="form-control" placeholder="Name" name="name" required>
@@ -75,11 +83,20 @@
                     <input type="text" class="form-control" placeholder="Level" name="level" required>
                 </div>
 
+                 <div class="mb-4">
+                    <input type="email" class="form-control" placeholder="E-mail" name="email" required>
+                </div>
+                <div class="mb-4">
+                <input type="file" name="image">
+                </div>
+
                 <div class="col-12">
                     <button class="btn btn-primary btn-custom" type="submit">
                         Submit Form
                     </button>
                 </div>
+
+
 
             </form>
 
@@ -87,6 +104,8 @@
 
     </div>
 </div>
+
+
 
 </body>
 

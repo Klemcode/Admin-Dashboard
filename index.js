@@ -1,9 +1,61 @@
 const express = require("express");
+require("dotenv").config();
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("./config/cloudinary");
+
 const app = express();
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "students",
+    allowed_formats: ["jpg", "png", "jpeg"]
+  }
+});
+
+const upload = multer({ storage: storage });
+
+
 app.set('view engine', 'ejs')
 const env= require('dotenv')
-require("dotenv").config();
+
+const mongoose = require('mongoose')
 app.use(express.urlencoded({ extended: true }));
+const userModel = require('./models/user.model')
+
+
+
+
+
+
+
+
+mongoose.connect(process.env.MONGODB_URI)
+  .then(async() => {
+    console.log('Database connected successfully');
+    await userModel.syncIndexes();
+  })
+  .catch((err) => {
+    // console.error('Error connecting to DB');
+
+    // types of error so that I will know where ogun come from
+    if (err.message.includes("ECONNREFUSED")) {
+      console.log("Network/DNS is blocking MongoDB");
+    }
+
+    if (err.message.includes("ReplicaSetNoPrimary")) {
+      console.log("Cannot reach cluster (check IP whitelist or network)");
+    }
+
+    if (err.message.includes("authentication failed")) {
+      console.log("Wrong username or password");
+    }
+
+    // This isn my full error too
+    console.error(err.message);
+  });
+
 
 
 let name = "Clement"
@@ -117,6 +169,39 @@ app.post('/editUsers/:id', (req, res) => {
 });
 
 // Edit student details end//
+
+
+  //CRUD
+
+  app.get('/addStudent', (req, res)=>{
+    let message = ""
+    res.render('addStudent', {message})
+})
+
+app.post('/addStudent', upload.single('image'), async (req, res) => {
+  try {
+
+    await userModel.create({
+      name: req.body.name,
+      email: req.body.email,
+      degree: req.body.degree,
+      level: req.body.level,
+      cgpa: req.body.cgpa,
+      image: req.file.path   // ✅ Cloudinary image URL
+    });
+
+    res.send("Student created successfully");
+
+  } catch (error) {
+    console.log(error);
+    res.send("Creation failed");
+  }
+});
+
+
+
+
+
 
 const myPort=process.env.PORT
 app.listen(myPort, (err) => {
