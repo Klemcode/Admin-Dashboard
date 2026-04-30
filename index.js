@@ -216,7 +216,7 @@ app.get('/displayStudents', async (req, res)=>{
  } catch (error) {
 
   console.log(error);
-  student=[]
+  // student=[]
    res.render('displayStudents', {student})
   
   
