@@ -191,13 +191,39 @@ app.post('/addStudent', upload.single('image'), async (req, res) => {
     });
 
     res.send("Student created successfully");
+    
 
   } catch (error) {
+    if (error.code === 11000) {
+      return res.send("User already exist");
+    }
     console.log(error);
     res.send("Creation failed");
   }
 });
 
+
+// display studennts from the db
+
+app.get('/displayStudents', async (req, res)=>{
+
+ try {
+  
+    let student= await userModel.find()
+    console.log(student);
+  res.render('displayStudents', {student})
+    
+ } catch (error) {
+
+  console.log(error);
+  student=[]
+   res.render('displayStudents', {student})
+  
+  
+ }
+
+
+})
 
 
 
