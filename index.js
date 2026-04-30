@@ -207,16 +207,17 @@ app.post('/addStudent', upload.single('image'), async (req, res) => {
 
 app.get('/displayStudents', async (req, res)=>{
 
+  let student=[]
  try {
   
-    let student= await userModel.find()
+     student= await userModel.find()
     console.log(student);
   res.render('displayStudents', {student})
     
  } catch (error) {
 
   console.log(error);
-  // student=[]
+ 
    res.render('displayStudents', {student})
   
   
