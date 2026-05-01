@@ -228,8 +228,6 @@ app.get('/displayStudents', async (req, res)=>{
 
 
 
-
-
 const myPort=process.env.PORT
 app.listen(myPort, (err) => {
   if (err) {
