@@ -21,6 +21,7 @@ app.set('view engine', 'ejs')
 const env= require('dotenv')
 
 const mongoose = require('mongoose')
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const userModel = require('./models/user.model')
 
@@ -57,8 +58,6 @@ mongoose.connect(process.env.MONGODB_URI)
   });
 
 
-
-let name = "Clement"
 let students = [
   {
     name: "Clement",
@@ -66,24 +65,7 @@ let students = [
     level: "400Level",
     cgpa: 4.80
   },
-  {
-    name: "Akorede",
-    degree: "Computer Science",
-    level: "400L",
-    cgpa: 3.50
-  },
-  {
-    name: "Adebayo",
-    degree: "Agricultural Economics",
-    level: "300L",
-    cgpa: 3.90
-  },
-  {
-    name: "Mary",
-    degree: "Biotechnology",
-    level: "200L",
-    cgpa: 4.20
-  },
+
   {
     name: "John",
     degree: "Soil Science",
@@ -92,7 +74,7 @@ let students = [
   }
 ];
 
-let age= 10
+
 
 console.log(students);
 
@@ -101,15 +83,10 @@ console.log(students);
 app.get('/about', (req,res)=>{
 
 
-    res.render('index', {students, name, age})
+    res.render('index', {students})
 })
 
 
-
-
-app.get('/hom', (req, res)=>{
-    res.send(students)
-})
 
 
 
@@ -174,8 +151,8 @@ app.post('/editUsers/:id', (req, res) => {
   //CRUD
 
   app.get('/addStudent', (req, res)=>{
-    let message = ""
-    res.render('addStudent', {message})
+  
+    res.render('addStudent')
 })
 
 app.post('/addStudent', upload.single('image'), async (req, res) => {
@@ -187,7 +164,7 @@ app.post('/addStudent', upload.single('image'), async (req, res) => {
       degree: req.body.degree,
       level: req.body.level,
       cgpa: req.body.cgpa,
-      image: req.file.path   // ✅ Cloudinary image URL
+      image: req.file.path   //Cloudinary image URL
     });
 
     res.send("Student created successfully");
@@ -203,7 +180,7 @@ app.post('/addStudent', upload.single('image'), async (req, res) => {
 });
 
 
-// display studennts from the db
+// display students from the db
 
 app.get('/displayStudents', async (req, res)=>{
 
@@ -222,8 +199,6 @@ app.get('/displayStudents', async (req, res)=>{
   
   
  }
-
-
 })
 
 
