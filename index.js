@@ -3,7 +3,7 @@ require("dotenv").config();
 const app = express();
 
 app.set("view engine", "ejs");
-const env = require("dotenv");
+// const env = require("dotenv");
 const mongoose = require("mongoose");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
