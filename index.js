@@ -1,40 +1,19 @@
 const express = require("express");
 require("dotenv").config();
-const multer = require("multer");
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const cloudinary = require("./config/cloudinary");
-
 const app = express();
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: "students",
-    allowed_formats: ["jpg", "png", "jpeg"]
-  }
-});
-
-const upload = multer({ storage: storage });
-
-
-app.set('view engine', 'ejs')
-const env= require('dotenv')
-
-const mongoose = require('mongoose')
+app.set("view engine", "ejs");
+const env = require("dotenv");
+const mongoose = require("mongoose");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const userModel = require('./models/user.model')
+const UserRoute = require("./routes/students.route");
+const userModel = require("./models/user.model");
 
-
-
-
-
-
-
-
-mongoose.connect(process.env.MONGODB_URI)
-  .then(async() => {
-    console.log('Database connected successfully');
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(async () => {
+    console.log("Database connected successfully");
     await userModel.syncIndexes();
   })
   .catch((err) => {
@@ -57,153 +36,86 @@ mongoose.connect(process.env.MONGODB_URI)
     console.error(err.message);
   });
 
+app.use("/api/v1", UserRoute);
 
-let students = [
-  {
-    name: "Clement",
-    degree: "Crop and Environmental Protection",
-    level: "400Level",
-    cgpa: 4.80
-  },
+// let students = [
+//   {
+//     name: "Clement",
+//     degree: "Crop and Environmental Protection",
+//     level: "400Level",
+//     cgpa: 4.80
+//   },
 
-  {
-    name: "John",
-    degree: "Soil Science",
-    level: "500L",
-    cgpa: 3.70
-  }
-];
+//   {
+//     name: "John",
+//     degree: "Soil Science",
+//     level: "500L",
+//     cgpa: 3.70
+//   }
+// ];
 
+// console.log(students);
 
+// app.get('/about', (req,res)=>{
 
-console.log(students);
+//     res.render('index', {students})
+// })
 
+// app.get('/login', (req,res)=>{
 
+//     res.redirect('/home')
+// })
 
-app.get('/about', (req,res)=>{
+// app.get('/home', (req,res)=>{
 
+//     res.sendFile(__dirname+'/index.html')
+// })
 
-    res.render('index', {students})
-})
+// app.get('/contact', (req,res)=>{
 
+// res.render('allStudents', {students})
 
+// })
 
+// app.post('/delUser/:id', (req, res)=>{
 
+// const {id}= req.params
+// students.splice(id,1)
+// res.render('allStudents', {students})
 
-app.get('/login', (req,res)=>{
+// })
 
-    res.redirect('/home')
-})
+// app.get('/addUser', (req, res)=>{
 
+//     res.render('addUser')
+// })
 
-app.get('/home', (req,res)=>{
+// app.post('/addUser', (req, res)=>{
+//     console.log(req);
+//     const {name, degree, cgpa, level} = req.body
+//     students.push(req.body)
+//     res.render('allStudents', {students})
+// })
 
-    res.sendFile(__dirname+'/index.html')
-})
+// // Edit student details start//
 
-app.get('/contact', (req,res)=>{
+// app.get('/editUsers/:id', (req, res) => {
+//     const {id} = req.params
+//     const student = students[id];
+//     res.render('editUsers', { student, id });
+// });
 
-res.render('allStudents', {students})
+// app.post('/editUsers/:id', (req, res) => {
 
-})
-
-
-app.post('/delUser/:id', (req, res)=>{
-
-const {id}= req.params
-students.splice(id,1)
-res.render('allStudents', {students})
-
-}) 
-
-app.get('/addUser', (req, res)=>{
-
-    res.render('addUser')
-})
-
-app.post('/addUser', (req, res)=>{
-    console.log(req);
-    const {name, degree, cgpa, level} = req.body
-    students.push(req.body)
-    res.render('allStudents', {students})
-})
-
-
-// Edit student details start//
-
-app.get('/editUsers/:id', (req, res) => {
-    const {id} = req.params
-    const student = students[id];
-    res.render('editUsers', { student, id });
-});
-
-app.post('/editUsers/:id', (req, res) => {
-
-    const {name, degree, cgpa, level} = req.body;
-    const{id} = req.params
-    students.splice(id, 1, req.body)
-    res.render('allStudents', {students});
-});
+//     const {name, degree, cgpa, level} = req.body;
+//     const{id} = req.params
+//     students.splice(id, 1, req.body)
+//     res.render('allStudents', {students});
+// });
 
 // Edit student details end//
 
-
-  //CRUD
-
-  app.get('/addStudent', (req, res)=>{
-  
-    res.render('addStudent')
-})
-
-app.post('/addStudent', upload.single('image'), async (req, res) => {
-  try {
-
-    await userModel.create({
-      name: req.body.name,
-      email: req.body.email,
-      degree: req.body.degree,
-      level: req.body.level,
-      cgpa: req.body.cgpa,
-      image: req.file.path   //Cloudinary image URL
-    });
-
-    res.send("Student created successfully");
-    
-
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.send("User already exist");
-    }
-    console.log(error);
-    res.send("Creation failed");
-  }
-});
-
-
-// display students from the db
-
-app.get('/displayStudents', async (req, res)=>{
-
-  let student=[]
- try {
-  
-     student= await userModel.find()
-    console.log(student);
-  res.render('displayStudents', {student})
-    
- } catch (error) {
-
-  console.log(error);
- 
-   res.render('displayStudents', {student})
-  
-  
- }
-})
-
-
-
-const myPort=process.env.PORT
+const myPort = process.env.PORT;
 app.listen(myPort, (err) => {
   if (err) {
     console.log("I can not start server, pls check error");
