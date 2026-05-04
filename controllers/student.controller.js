@@ -42,4 +42,51 @@ const displayStudents = async (req, res) => {
   }
 };
 
-module.exports = { getAddStudentPage, saveStudentToDB, displayStudents };
+//Delete data from DB
+const deleteDBStudent = async(req, res)=>{
+
+  const {id}=req.params
+  try {
+    await userModel.findByIdAndDelete(id)
+    res.status(200).send({
+      message:"User deleted successfully"
+    })
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      message: "failed to delete user"
+    })
+  }
+}
+
+//edit what is in the DB
+
+const editDBUser = async (req, res)=>{
+const {id}= req.params
+const {name, cgpa}= req.body
+try {
+  
+  await userModel.findByIdAndUpdate(id, {name, cgpa})
+  res.status(200).send({
+    message: "User Edited Successfully"
+  })
+} catch (error) {
+  console.log(error);
+  res.status(400).send({
+    message: "Error editing DB User"
+  })
+  
+  
+}
+
+
+
+}
+
+module.exports = { 
+  getAddStudentPage, 
+  saveStudentToDB, 
+  displayStudents,
+deleteDBStudent,
+editDBUser};

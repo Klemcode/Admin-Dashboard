@@ -7,6 +7,7 @@ app.set("view engine", "ejs");
 const mongoose = require("mongoose");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 const UserRoute = require("./routes/students.route");
 const userModel = require("./models/user.model");
 
