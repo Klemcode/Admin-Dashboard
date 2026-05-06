@@ -1,28 +1,79 @@
 const userModel = require("../models/user.model");
-
+const bcrypt = require("bcryptjs")
 const getAddStudentPage = (req, res) => {
   res.render("addStudent");
 };
 
 const saveStudentToDB = async (req, res) => {
   try {
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
     await userModel.create({
       name: req.body.name,
       email: req.body.email,
+      password: hashedPassword, // ✅ store hashed password
       degree: req.body.degree,
       level: req.body.level,
       cgpa: req.body.cgpa,
-      image: req.file.path, //Cloudinary image URL
+      image: req.file.path
     });
+
     res.send("Student created successfully");
+
   } catch (error) {
     if (error.code === 11000) {
-      return res.send("User already exist");
+      return res.send("User already exists");
     }
+
     console.log(error);
-    res.send("Creation failed");
+
+    res.status(500).send({
+      message: "Creation failed"
+    });
   }
 };
+
+// log in
+
+const login= async (req, res)=>{
+
+  const {email, password} =req.body
+  try {
+    const user= await userModel.findOne({email})
+    if(!user){
+      res.status(404).send({
+        message: "invalid credentials"
+      })
+      return
+    }
+
+    const isMatch= await bcrypt.compare(password, user.password)
+    if(!isMatch){
+      res.status(404).send({
+        message: "Invalid credentials"
+      })
+      return
+    }
+      res.status(200).send({
+      message: "User logged in successfully",
+      data: {
+        email: user.email,
+        name: user.name
+      }
+    });
+
+  } catch (error) {
+    
+    console.log(error);
+    res.status(404).send({
+      message: "invalid credential"
+    })
+    
+  }
+
+}
+
+
 
 // display students from the db
 
@@ -77,10 +128,7 @@ try {
     message: "Error editing DB User"
   })
   
-  
 }
-
-
 
 }
 
@@ -89,4 +137,5 @@ module.exports = {
   saveStudentToDB, 
   displayStudents,
 deleteDBStudent,
-editDBUser};
+editDBUser,
+login};
